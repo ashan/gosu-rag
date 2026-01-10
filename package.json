@@ -9,6 +9,7 @@
     "dev": "ts-node src/cli/index.ts",
     "ingest": "ts-node src/cli/index.ts ingest",
     "query": "ts-node src/cli/index.ts query",
+    "inspect-chroma": "ts-node scripts/inspect-chroma.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -29,6 +30,7 @@
   "dependencies": {
     "chromadb": "^3.2.0",
     "dotenv": "^17.2.3",
+    "openai": "^6.16.0",
     "tree-sitter": "^0.25.0",
     "tree-sitter-gosu": "github:ashan/tree-sitter-gosu",
     "tree-sitter-gosu-template": "github:ashan/tree-sitter-gosu-template",
