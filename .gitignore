@@ -39,3 +39,8 @@ logs/
 
 # ChromaDB data
 chroma_data/
+
+# SQLite databases
+*.db
+*.db-journal
+*.db-wal

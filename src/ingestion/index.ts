@@ -4,3 +4,9 @@ export {
     IngestionProgress,
     IngestionResult,
 } from './IngestionPipeline';
+export {
+    IngestionLogger,
+    IngestionLogEntry,
+    IngestionStatus,
+    categorizeError,
+} from './IngestionLogger';

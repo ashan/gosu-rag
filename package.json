@@ -10,6 +10,7 @@
     "ingest": "ts-node src/cli/index.ts ingest",
     "query": "ts-node src/cli/index.ts query",
     "inspect-chroma": "ts-node scripts/inspect-chroma.ts",
+    "view-logs": "ts-node scripts/view-logs.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -28,6 +29,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.5.0",
     "chromadb": "^3.2.0",
     "dotenv": "^17.2.3",
     "openai": "^6.16.0",

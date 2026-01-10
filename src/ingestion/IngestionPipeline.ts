@@ -4,6 +4,7 @@ import { GosuChunker, GosuTemplateChunker, Chunk } from '../chunkers';
 import { IEmbeddingProvider } from '../embeddings';
 import { IVectorStore } from '../vectorstore';
 import { HashTracker } from './HashTracker';
+import { IngestionLogger, IngestionStatus, categorizeError } from './IngestionLogger';
 import { loadConfig } from '../config';
 
 export interface IngestionProgress {
@@ -28,16 +29,19 @@ export class IngestionPipeline {
     private hashTracker: HashTracker;
     private embeddingProvider: IEmbeddingProvider;
     private vectorStore: IVectorStore;
+    private logger: IngestionLogger;
     private progressCallback?: (progress: IngestionProgress) => void;
 
     constructor(
         embeddingProvider: IEmbeddingProvider,
         vectorStore: IVectorStore,
-        hashTracker?: HashTracker
+        hashTracker?: HashTracker,
+        logger?: IngestionLogger
     ) {
         this.embeddingProvider = embeddingProvider;
         this.vectorStore = vectorStore;
         this.hashTracker = hashTracker || new HashTracker();
+        this.logger = logger || new IngestionLogger();
     }
 
     /**
