@@ -95,11 +95,12 @@ export class IngestionPipeline {
             // Process batch concurrently
             const results = await Promise.allSettled(
                 batch.map(async (filePath) => {
+                    const startTime = Date.now();
                     try {
                         // Check if file changed
                         const hasChanged = await this.hashTracker.hasFileChanged(filePath);
                         if (!hasChanged) {
-                            return { status: 'skipped' as const, filePath };
+                            return { status: 'skipped' as const, filePath, duration: Date.now() - startTime };
                         }
 
                         // Process file
@@ -108,28 +109,64 @@ export class IngestionPipeline {
                             await this.hashTracker.updateFile(filePath, chunks.length);
                         }
 
-                        return { status: 'processed' as const, filePath, chunkCount: chunks.length };
+                        return { status: 'processed' as const, filePath, chunkCount: chunks.length, duration: Date.now() - startTime };
                     } catch (error) {
                         const errorMsg = error instanceof Error ? error.message : String(error);
-                        return { status: 'error' as const, filePath, error: errorMsg };
+                        const errorType = categorizeError(error instanceof Error ? error : errorMsg);
+                        return {
+                            status: 'error' as const,
+                            filePath,
+                            error: errorMsg,
+                            errorType,
+                            errorObject: error,
+                            duration: Date.now() - startTime
+                        };
                     }
                 })
             );
 
-            // Update progress
+            // Update progress and log results
             for (const result of results) {
                 if (result.status === 'fulfilled') {
                     const value = result.value;
+                    const relativePath = path.relative(sourceRoot, value.filePath);
+
                     if (value.status === 'skipped') {
                         progress.skippedFiles++;
-                        console.log(`⏭️  ${path.relative(sourceRoot, value.filePath)}`);
+                        this.logger.log({
+                            timestamp: new Date().toISOString(),
+                            sessionId: this.logger.getSessionId(),
+                            filePath: value.filePath,
+                            relativePath,
+                            status: IngestionStatus.SKIPPED,
+                            duration: value.duration,
+                        });
+                        console.log(`⏭️  ${relativePath}`);
                     } else if (value.status === 'processed') {
                         progress.processedFiles++;
                         progress.totalChunks += value.chunkCount || 0;
-                        console.log(`✅ ${path.relative(sourceRoot, value.filePath)} (${value.chunkCount} chunks)`);
+                        this.logger.log({
+                            timestamp: new Date().toISOString(),
+                            sessionId: this.logger.getSessionId(),
+                            filePath: value.filePath,
+                            relativePath,
+                            status: IngestionStatus.SUCCESS,
+                            chunkCount: value.chunkCount,
+                            duration: value.duration,
+                        });
+                        console.log(`✅ ${relativePath} (${value.chunkCount} chunks)`);
                     } else if (value.status === 'error') {
                         progress.errors.push({ file: value.filePath, error: value.error });
-                        console.error(`❌ ${path.relative(sourceRoot, value.filePath)}: ${value.error}`);
+                        this.logger.log({
+                            timestamp: new Date().toISOString(),
+                            sessionId: this.logger.getSessionId(),
+                            filePath: value.filePath,
+                            relativePath,
+                            status: value.errorType,
+                            errorMessage: value.error,
+                            duration: value.duration,
+                        });
+                        console.error(`❌ ${relativePath}: ${value.error}`);
                     }
                 } else {
                     console.error(`❌ Batch error: ${result.reason}`);
@@ -156,6 +193,11 @@ export class IngestionPipeline {
         console.log(`   Skipped: ${result.filesSkipped} files`);
         console.log(`   Chunks: ${result.chunksCreated}`);
         console.log(`   Errors: ${result.errors}`);
+
+        // Export logs
+        console.log(`\n📊 Session: ${this.logger.getSessionId()}`);
+        this.logger.exportToJSON();
+        console.log(`📝 View logs: npm run view-logs summary`);
 
         return result;
     }
