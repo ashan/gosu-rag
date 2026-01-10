@@ -75,34 +75,64 @@ export class IngestionPipeline {
             errors: [],
         };
 
-        // Process files
-        for (const filePath of files) {
-            progress.currentFile = filePath;
-            this.reportProgress(progress);
+        // Process files in parallel batches
+        const concurrency = this.config.embeddingConcurrency || 5;
+        const batchSize = 50; // Process 50 files at a time
 
-            try {
-                // Check if file changed
-                const hasChanged = await this.hashTracker.hasFileChanged(filePath);
-                if (!hasChanged) {
-                    progress.skippedFiles++;
-                    console.log(`⏭️  Skipped (unchanged): ${path.relative(sourceRoot, filePath)}`);
-                    continue;
+        console.log(`⚡ Processing with concurrency: ${concurrency}\n`);
+
+        for (let i = 0; i < files.length; i += batchSize) {
+            const batch = files.slice(i, i + batchSize);
+            const batchNum = Math.floor(i / batchSize) + 1;
+            const totalBatches = Math.ceil(files.length / batchSize);
+
+            console.log(`📦 Batch ${batchNum}/${totalBatches} (${batch.length} files)`);
+
+            // Process batch concurrently
+            const results = await Promise.allSettled(
+                batch.map(async (filePath) => {
+                    try {
+                        // Check if file changed
+                        const hasChanged = await this.hashTracker.hasFileChanged(filePath);
+                        if (!hasChanged) {
+                            return { status: 'skipped' as const, filePath };
+                        }
+
+                        // Process file
+                        const chunks = await this.processFile(filePath, sourceRoot);
+                        if (chunks.length > 0) {
+                            await this.hashTracker.updateFile(filePath, chunks.length);
+                        }
+
+                        return { status: 'processed' as const, filePath, chunkCount: chunks.length };
+                    } catch (error) {
+                        const errorMsg = error instanceof Error ? error.message : String(error);
+                        return { status: 'error' as const, filePath, error: errorMsg };
+                    }
+                })
+            );
+
+            // Update progress
+            for (const result of results) {
+                if (result.status === 'fulfilled') {
+                    const value = result.value;
+                    if (value.status === 'skipped') {
+                        progress.skippedFiles++;
+                        console.log(`⏭️  ${path.relative(sourceRoot, value.filePath)}`);
+                    } else if (value.status === 'processed') {
+                        progress.processedFiles++;
+                        progress.totalChunks += value.chunkCount || 0;
+                        console.log(`✅ ${path.relative(sourceRoot, value.filePath)} (${value.chunkCount} chunks)`);
+                    } else if (value.status === 'error') {
+                        progress.errors.push({ file: value.filePath, error: value.error });
+                        console.error(`❌ ${path.relative(sourceRoot, value.filePath)}: ${value.error}`);
+                    }
+                } else {
+                    console.error(`❌ Batch error: ${result.reason}`);
                 }
-
-                // Process file
-                const chunks = await this.processFile(filePath, sourceRoot);
-                if (chunks.length > 0) {
-                    progress.totalChunks += chunks.length;
-                    await this.hashTracker.updateFile(filePath, chunks.length);
-                }
-
-                progress.processedFiles++;
-                console.log(`✅ Processed: ${path.relative(sourceRoot, filePath)} (${chunks.length} chunks)`);
-            } catch (error) {
-                const errorMsg = error instanceof Error ? error.message : String(error);
-                progress.errors.push({ file: filePath, error: errorMsg });
-                console.error(`❌ Error processing ${filePath}:`, errorMsg);
             }
+
+            console.log(`   Progress: ${progress.processedFiles + progress.skippedFiles}/${files.length}\n`);
         }
 
         // Save hash cache
@@ -160,14 +190,27 @@ export class IngestionPipeline {
             return [];
         }
 
+        // Filter out chunks that are too large (>8000 tokens ≈ 32000 chars)
+        const MAX_CHUNK_SIZE = 30000; // Conservative limit
+        const validChunks = chunks.filter(chunk => chunk.content.length <= MAX_CHUNK_SIZE);
+
+        if (validChunks.length < chunks.length) {
+            const skipped = chunks.length - validChunks.length;
+            console.warn(`⚠️  Skipped ${skipped} oversized chunk(s) in ${path.basename(filePath)}`);
+        }
+
+        if (validChunks.length === 0) {
+            return [];
+        }
+
         // Generate embeddings
-        const texts = chunks.map(chunk => chunk.content);
+        const texts = validChunks.map(chunk => chunk.content);
         const embeddings = await this.embeddingProvider.embed(texts);
 
         // Upsert to vector store
-        await this.vectorStore.upsert(chunks, embeddings);
+        await this.vectorStore.upsert(validChunks, embeddings);
 
-        return chunks;
+        return validChunks;
     }
 
     private reportProgress(progress: IngestionProgress): void {
