@@ -57,7 +57,7 @@ export interface Chunk {
  * Generate a unique chunk ID from metadata
  * Includes content hash to ensure uniqueness even for identical code structure
  */
-export function generateChunkId(metadata: ChunkMetadata): string {
+export function generateChunkId(metadata: ChunkMetadata, chunkIndex?: number): string {
     const parts = [
         metadata.relativePath,
         metadata.package,
@@ -67,6 +67,7 @@ export function generateChunkId(metadata: ChunkMetadata): string {
         metadata.lineStart,
         metadata.lineEnd,
         metadata.contentHash.substring(0, 16), // First 16 chars of content hash
+        chunkIndex !== undefined ? chunkIndex.toString() : undefined, // Absolute uniqueness
     ].filter(Boolean);
 
     return crypto
@@ -90,13 +91,14 @@ export function generateContentHash(content: string): string {
  */
 export function createChunk(
     content: string,
-    metadata: Omit<ChunkMetadata, 'contentHash'>
+    metadata: Omit<ChunkMetadata, 'contentHash'>,
+    chunkIndex?: number
 ): Chunk {
     const contentHash = generateContentHash(content);
     const fullMetadata: ChunkMetadata = { ...metadata, contentHash };
 
     return {
-        id: generateChunkId(fullMetadata),
+        id: generateChunkId(fullMetadata, chunkIndex),
         content,
         metadata: fullMetadata,
     };

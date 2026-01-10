@@ -50,7 +50,8 @@ export class GosuTemplateChunker implements IChunker {
                 node,
                 absolutePath,
                 relativePath,
-                sourceCode
+                sourceCode,
+                chunks.length // Pass current chunk count as index
             );
             if (chunk) {
                 chunks.push(chunk);
@@ -86,7 +87,8 @@ export class GosuTemplateChunker implements IChunker {
         node: Parser.SyntaxNode,
         absolutePath: string,
         relativePath: string,
-        sourceCode: string
+        sourceCode: string,
+        chunkIndex: number
     ): Chunk | null {
         const startLine = node.startPosition.row;
         const endLine = node.endPosition.row;
@@ -105,7 +107,7 @@ export class GosuTemplateChunker implements IChunker {
             language: 'gosu_template',
             lineStart: startLine + 1,
             lineEnd: endLine + 1,
-        });
+        }, chunkIndex);
     }
 
     private mapNodeTypeToChunkType(nodeType: string): ChunkType {

@@ -66,7 +66,8 @@ export class GosuChunker implements IChunker {
                 relativePath,
                 packageName,
                 sourceCode,
-                lines
+                lines,
+                chunks.length // Pass current chunk count as index
             );
             if (chunk) {
                 chunks.push(chunk);
@@ -107,7 +108,8 @@ export class GosuChunker implements IChunker {
         relativePath: string,
         packageName: string | undefined,
         sourceCode: string,
-        lines: string[]
+        lines: string[],
+        chunkIndex: number
     ): Chunk | null {
         const startLine = node.startPosition.row;
         const endLine = node.endPosition.row;
@@ -133,7 +135,7 @@ export class GosuChunker implements IChunker {
             language: 'gosu',
             lineStart: startLine + 1, // 1-indexed
             lineEnd: endLine + 1,
-        });
+        }, chunkIndex);
     }
 
     private extractName(node: Parser.SyntaxNode): string | undefined {
