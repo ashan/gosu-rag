@@ -214,8 +214,23 @@ export class IngestionPipeline {
 
         // Parse file
         const parseResult = await parser.parse(filePath);
+        let hasParseErrors = false;
+
         if (parseResult.hasError) {
+            hasParseErrors = true;
             console.warn(`⚠️  Parse errors in: ${filePath}`);
+
+            // Log parse error but continue processing
+            // (chunks may still be extracted from partially valid AST)
+            this.logger.log({
+                timestamp: new Date().toISOString(),
+                sessionId: this.logger.getSessionId(),
+                filePath,
+                relativePath: path.relative(sourceRoot, filePath),
+                status: IngestionStatus.PARSE_ERROR,
+                errorMessage: 'Parse errors detected in AST (processing continued)',
+                duration: 0,
+            });
         }
 
         // Get chunker
