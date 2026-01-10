@@ -95,6 +95,7 @@ export class GosuChunker implements IChunker {
             'class_declaration',
             'interface_declaration',
             'enum_declaration',
+            'enhancement_declaration',
             'function_declaration',
             'property_declaration',
         ].includes(nodeType);
@@ -149,6 +150,7 @@ export class GosuChunker implements IChunker {
             class_declaration: 'class',
             interface_declaration: 'interface',
             enum_declaration: 'enum',
+            enhancement_declaration: 'class', // Treat enhancements like classes
             function_declaration: 'function',
             property_declaration: 'property',
         };
@@ -156,7 +158,7 @@ export class GosuChunker implements IChunker {
     }
 
     private isClassLevel(nodeType: string): boolean {
-        return ['class_declaration', 'interface_declaration', 'enum_declaration'].includes(nodeType);
+        return ['class_declaration', 'interface_declaration', 'enum_declaration', 'enhancement_declaration'].includes(nodeType);
     }
 
     private isMethodLevel(nodeType: string): boolean {
