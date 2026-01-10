@@ -41,10 +41,17 @@ async function main() {
 }
 
 function showSummary(logger: IngestionLogger) {
-    console.log('📊 Ingestion Summary\n');
-    console.log(`Session: ${logger.getSessionId()}\n`);
+    const latestSession = logger.getLatestSession();
 
-    const summary = logger.getSessionSummary();
+    if (!latestSession) {
+        console.log('No ingestion sessions found in database.');
+        return;
+    }
+
+    console.log('📊 Ingestion Summary\n');
+    console.log(`Session: ${latestSession}\n`);
+
+    const summary = logger.getSessionSummary(latestSession);
 
     let totalFiles = 0;
     let totalChunks = 0;
@@ -63,7 +70,14 @@ function showSummary(logger: IngestionLogger) {
 }
 
 function showErrors(logger: IngestionLogger) {
-    const errors = logger.getErrors();
+    const latestSession = logger.getLatestSession();
+
+    if (!latestSession) {
+        console.log('No ingestion sessions found in database.');
+        return;
+    }
+
+    const errors = logger.getErrors(latestSession);
 
     console.log(`\n❌ Errors (${errors.length} total)\n`);
 
@@ -79,7 +93,14 @@ function showErrors(logger: IngestionLogger) {
 }
 
 function showParseErrors(logger: IngestionLogger) {
-    const errors = logger.getParseErrors();
+    const latestSession = logger.getLatestSession();
+
+    if (!latestSession) {
+        console.log('No ingestion sessions found in database.');
+        return;
+    }
+
+    const errors = logger.getParseErrors(latestSession);
 
     console.log(`\n🔍 Parse Errors (${errors.length} total)\n`);
 
@@ -98,7 +119,7 @@ function showParseErrors(logger: IngestionLogger) {
 function listSessions(logger: IngestionLogger) {
     // This would require querying for all sessions
     console.log('📋 Sessions feature - to be implemented');
-    console.log(`Current session: ${logger.getSessionId()}`);
+    console.log(`Latest session: ${logger.getLatestSession()}`);
 }
 
 main();

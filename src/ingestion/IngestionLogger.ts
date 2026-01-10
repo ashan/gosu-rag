@@ -86,6 +86,17 @@ export class IngestionLogger {
         );
     }
 
+    getLatestSession(): string | null {
+        const stmt = this.db.prepare(`
+      SELECT session_id FROM ingestion_logs
+      ORDER BY timestamp DESC
+      LIMIT 1
+    `);
+
+        const result = stmt.get() as { session_id: string } | undefined;
+        return result?.session_id || null;
+    }
+
     getSessionSummary(sessionId?: string): any {
         const sid = sessionId || this.sessionId;
         const stmt = this.db.prepare(`
