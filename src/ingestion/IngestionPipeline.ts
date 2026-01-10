@@ -217,10 +217,6 @@ export class IngestionPipeline {
         const parseResult = await parser.parse(filePath);
         const hasParseError = parseResult.hasError;
 
-        if (hasParseError) {
-            console.warn(`⚠️  Parse errors in: ${filePath}`);
-        }
-
         // Get chunker
         const ext = path.extname(filePath);
         const chunker = ext === '.gst'
@@ -237,6 +233,7 @@ export class IngestionPipeline {
 
         // Only log parse error if extraction actually failed
         if (chunks.length === 0 && hasParseError) {
+            console.warn(`⚠️  Parse error prevented extraction: ${filePath}`);
             const errorNodes = this.extractErrorNodes(parseResult.tree);
             const firstError = errorNodes[0];
 
