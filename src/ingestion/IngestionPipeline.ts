@@ -307,9 +307,9 @@ export class IngestionPipeline {
 
         const traverse = (node: Parser.SyntaxNode) => {
             // Capture ERROR nodes and MISSING nodes
-            if (node.type === 'ERROR' || node.isMissing()) {
+            if (node.type === 'ERROR' || node.isMissing) {
                 errors.push({
-                    type: node.isMissing() ? 'MISSING' : node.type,
+                    type: node.isMissing ? 'MISSING' : node.type,
                     startLine: node.startPosition.row + 1,
                     startColumn: node.startPosition.column + 1,
                     endLine: node.endPosition.row + 1,
