@@ -62,7 +62,7 @@ export class OpenAIEmbeddingProvider implements IEmbeddingProvider {
     private async retryWithBackoff<T>(
         fn: () => Promise<T>,
         context: string,
-        maxRetries: number = 5
+        maxRetries: number = 10 // Increased from 5 to handle persistent rate limits
     ): Promise<T> {
         let lastError: Error | undefined;
 
