@@ -55,6 +55,7 @@ export interface Chunk {
 
 /**
  * Generate a unique chunk ID from metadata
+ * Includes content hash to ensure uniqueness even for identical code structure
  */
 export function generateChunkId(metadata: ChunkMetadata): string {
     const parts = [
@@ -62,8 +63,10 @@ export function generateChunkId(metadata: ChunkMetadata): string {
         metadata.package,
         metadata.className,
         metadata.methodName,
+        metadata.chunkType,
         metadata.lineStart,
         metadata.lineEnd,
+        metadata.contentHash.substring(0, 16), // First 16 chars of content hash
     ].filter(Boolean);
 
     return crypto
