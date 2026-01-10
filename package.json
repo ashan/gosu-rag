@@ -11,6 +11,7 @@
     "query": "ts-node src/cli/index.ts query",
     "inspect-chroma": "ts-node scripts/inspect-chroma.ts",
     "view-logs": "ts-node scripts/view-logs.ts",
+    "extract-parse-errors": "ts-node scripts/extract-parse-errors.ts",
     "clean-cache": "rm -f .rag-cache.json ingestion.db ingestion-report-*.json && echo '✅ Cleaned: hash cache and logs (ChromaDB data preserved)'",
     "clean-all": "rm -f .rag-cache.json ingestion.db ingestion-report-*.json && rm -rf chroma_data/ && echo '✅ Cleaned: everything (run docker compose up -d before ingesting)'",
     "clean-ingest": "npm run clean-cache && npm run ingest",

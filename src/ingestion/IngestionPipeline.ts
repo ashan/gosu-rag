@@ -1,4 +1,5 @@
 import * as path from 'path';
+import Parser from 'tree-sitter';
 import { FileDiscovery, ParserFactory } from '../parsers';
 import { GosuChunker, GosuTemplateChunker, Chunk } from '../chunkers';
 import { IEmbeddingProvider } from '../embeddings';
@@ -214,21 +215,25 @@ export class IngestionPipeline {
 
         // Parse file
         const parseResult = await parser.parse(filePath);
-        let hasParseErrors = false;
 
         if (parseResult.hasError) {
-            hasParseErrors = true;
             console.warn(`⚠️  Parse errors in: ${filePath}`);
 
-            // Log parse error but continue processing
-            // (chunks may still be extracted from partially valid AST)
+            // Extract detailed error information
+            const errorNodes = this.extractErrorNodes(parseResult.tree);
+            const firstError = errorNodes[0];
+
+            // Log parse error with detailed information
             this.logger.log({
                 timestamp: new Date().toISOString(),
                 sessionId: this.logger.getSessionId(),
                 filePath,
                 relativePath: path.relative(sourceRoot, filePath),
                 status: IngestionStatus.PARSE_ERROR,
-                errorMessage: 'Parse errors detected in AST (processing continued)',
+                errorMessage: `${errorNodes.length} ERROR node(s) found in AST (processing continued)`,
+                errorDetails: JSON.stringify(errorNodes, null, 2),
+                lineNumber: firstError?.startLine,
+                columnNumber: firstError?.startColumn,
                 duration: 0,
             });
         }
@@ -278,5 +283,49 @@ export class IngestionPipeline {
         if (this.progressCallback) {
             this.progressCallback(progress);
         }
+    }
+
+    /**
+     * Extract ERROR nodes from tree-sitter AST
+     */
+    private extractErrorNodes(tree: Parser.Tree): Array<{
+        type: string;
+        startLine: number;
+        startColumn: number;
+        endLine: number;
+        endColumn: number;
+        text: string;
+    }> {
+        const errors: Array<{
+            type: string;
+            startLine: number;
+            startColumn: number;
+            endLine: number;
+            endColumn: number;
+            text: string;
+        }> = [];
+
+        const traverse = (node: Parser.SyntaxNode) => {
+            // Capture ERROR nodes and MISSING nodes
+            if (node.type === 'ERROR' || node.isMissing()) {
+                errors.push({
+                    type: node.isMissing() ? 'MISSING' : node.type,
+                    startLine: node.startPosition.row + 1,
+                    startColumn: node.startPosition.column + 1,
+                    endLine: node.endPosition.row + 1,
+                    endColumn: node.endPosition.column + 1,
+                    text: node.text.substring(0, 200), // First 200 chars
+                });
+            }
+
+            // Traverse children
+            for (let i = 0; i < node.childCount; i++) {
+                const child = node.child(i);
+                if (child) traverse(child);
+            }
+        };
+
+        traverse(tree.rootNode);
+        return errors;
     }
 }
