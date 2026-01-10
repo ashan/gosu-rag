@@ -44,3 +44,6 @@ chroma_data/
 *.db
 *.db-journal
 *.db-wal
+
+# Hash cache
+.rag-cache.json
