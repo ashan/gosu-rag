@@ -215,27 +215,10 @@ export class IngestionPipeline {
 
         // Parse file
         const parseResult = await parser.parse(filePath);
+        const hasParseError = parseResult.hasError;
 
-        if (parseResult.hasError) {
+        if (hasParseError) {
             console.warn(`⚠️  Parse errors in: ${filePath}`);
-
-            // Extract detailed error information
-            const errorNodes = this.extractErrorNodes(parseResult.tree);
-            const firstError = errorNodes[0];
-
-            // Log parse error with detailed information
-            this.logger.log({
-                timestamp: new Date().toISOString(),
-                sessionId: this.logger.getSessionId(),
-                filePath,
-                relativePath: path.relative(sourceRoot, filePath),
-                status: IngestionStatus.PARSE_ERROR,
-                errorMessage: `${errorNodes.length} ERROR node(s) found in AST (processing continued)`,
-                errorDetails: JSON.stringify(errorNodes, null, 2),
-                lineNumber: firstError?.startLine,
-                columnNumber: firstError?.startColumn,
-                duration: 0,
-            });
         }
 
         // Get chunker
@@ -251,6 +234,25 @@ export class IngestionPipeline {
             filePath,
             sourceCode
         );
+
+        // Only log parse error if extraction actually failed
+        if (chunks.length === 0 && hasParseError) {
+            const errorNodes = this.extractErrorNodes(parseResult.tree);
+            const firstError = errorNodes[0];
+
+            this.logger.log({
+                timestamp: new Date().toISOString(),
+                sessionId: this.logger.getSessionId(),
+                filePath,
+                relativePath: path.relative(sourceRoot, filePath),
+                status: IngestionStatus.PARSE_ERROR,
+                errorMessage: `Parse error prevented chunk extraction (${errorNodes.length} issue(s) in AST)`,
+                errorDetails: JSON.stringify(errorNodes, null, 2),
+                lineNumber: firstError?.startLine,
+                columnNumber: firstError?.startColumn,
+                duration: 0,
+            });
+        }
 
         if (chunks.length === 0) {
             return [];
