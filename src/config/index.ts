@@ -11,6 +11,14 @@ const configSchema = z.object({
     chunkSize: z.coerce.number().positive().default(1000),
     chunkOverlap: z.coerce.number().nonnegative().default(200),
 
+    // Semantic Units Configuration
+    gosuSemanticUnits: z.string()
+        .default('class_declaration,interface_declaration,enum_declaration,enhancement_declaration,function_declaration,property_declaration')
+        .transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
+    gosuTemplateSemanticUnits: z.string()
+        .default('directive,scriptlet,expression,declaration')
+        .transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
+
     // Embeddings Configuration
     embeddingProvider: z.enum(['openai', 'ollama']).default('openai'),
     embeddingModel: z.string().default('text-embedding-3-small'),
@@ -35,6 +43,8 @@ export function loadConfig(): Config {
         sourcePath: process.env.SOURCE_PATH,
         chunkSize: process.env.CHUNK_SIZE,
         chunkOverlap: process.env.CHUNK_OVERLAP,
+        gosuSemanticUnits: process.env.GOSU_SEMANTIC_UNITS,
+        gosuTemplateSemanticUnits: process.env.GOSU_TEMPLATE_SEMANTIC_UNITS,
         embeddingProvider: process.env.EMBEDDING_PROVIDER,
         embeddingModel: process.env.EMBEDDING_MODEL,
         embeddingBatchSize: process.env.EMBEDDING_BATCH_SIZE,

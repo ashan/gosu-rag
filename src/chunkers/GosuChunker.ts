@@ -92,14 +92,7 @@ export class GosuChunker implements IChunker {
     }
 
     private isSemanticUnit(nodeType: string): boolean {
-        return [
-            'class_declaration',
-            'interface_declaration',
-            'enum_declaration',
-            'enhancement_declaration',
-            'function_declaration',
-            'property_declaration',
-        ].includes(nodeType);
+        return this.config.gosuSemanticUnits.includes(nodeType);
     }
 
     private createChunkFromNode(

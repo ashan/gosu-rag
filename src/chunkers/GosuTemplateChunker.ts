@@ -75,12 +75,7 @@ export class GosuTemplateChunker implements IChunker {
     }
 
     private isTemplateUnit(nodeType: string): boolean {
-        return [
-            'directive',
-            'scriptlet',
-            'expression',
-            'declaration',
-        ].includes(nodeType);
+        return this.config.gosuTemplateSemanticUnits.includes(nodeType);
     }
 
     private createChunkFromNode(
