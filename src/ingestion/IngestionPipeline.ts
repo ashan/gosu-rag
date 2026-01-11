@@ -261,7 +261,31 @@ export class IngestionPipeline {
 
         if (validChunks.length < chunks.length) {
             const skipped = chunks.length - validChunks.length;
+            const oversizedChunks = chunks.filter(chunk => chunk.content.length > MAX_CHUNK_SIZE);
+
             console.warn(`⚠️  Skipped ${skipped} oversized chunk(s) in ${path.basename(filePath)}`);
+
+            // Log as chunk_error for tracking
+            this.logger.log({
+                timestamp: new Date().toISOString(),
+                sessionId: this.logger.getSessionId(),
+                filePath,
+                relativePath: path.relative(sourceRoot, filePath),
+                status: IngestionStatus.CHUNK_ERROR,
+                chunkCount: skipped,
+                errorMessage: `${skipped} chunk(s) exceeded ${MAX_CHUNK_SIZE} character limit`,
+                errorDetails: JSON.stringify(
+                    oversizedChunks.map(c => ({
+                        lineStart: c.metadata.lineStart,
+                        lineEnd: c.metadata.lineEnd,
+                        size: c.content.length,
+                        chunkType: c.metadata.chunkType,
+                    })),
+                    null,
+                    2
+                ),
+                duration: 0,
+            });
         }
 
         if (validChunks.length === 0) {
