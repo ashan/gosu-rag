@@ -255,37 +255,16 @@ export class IngestionPipeline {
             return [];
         }
 
-        // Filter out chunks that are too large (>8000 tokens ≈ 32000 chars)
-        const MAX_CHUNK_SIZE = 30000; // Conservative limit
-        const validChunks = chunks.filter(chunk => chunk.content.length <= MAX_CHUNK_SIZE);
+        // Split oversized chunks instead of filtering them out
+        const { validChunks, splitCount } = splitOversizedChunks(
+            chunks,
+            this.config.chunkSize,
+            this.config.chunkOverlap
+        );
 
-        if (validChunks.length < chunks.length) {
-            const skipped = chunks.length - validChunks.length;
-            const oversizedChunks = chunks.filter(chunk => chunk.content.length > MAX_CHUNK_SIZE);
-
-            console.warn(`⚠️  Skipped ${skipped} oversized chunk(s) in ${path.basename(filePath)}`);
-
-            // Log as chunk_error for tracking
-            this.logger.log({
-                timestamp: new Date().toISOString(),
-                sessionId: this.logger.getSessionId(),
-                filePath,
-                relativePath: path.relative(sourceRoot, filePath),
-                status: IngestionStatus.CHUNK_ERROR,
-                chunkCount: skipped,
-                errorMessage: `${skipped} chunk(s) exceeded ${MAX_CHUNK_SIZE} character limit`,
-                errorDetails: JSON.stringify(
-                    oversizedChunks.map(c => ({
-                        lineStart: c.metadata.lineStart,
-                        lineEnd: c.metadata.lineEnd,
-                        size: c.content.length,
-                        chunkType: c.metadata.chunkType,
-                    })),
-                    null,
-                    2
-                ),
-                duration: 0,
-            });
+        if (splitCount > 0) {
+            const originalCount = chunks.filter(c => c.content.length > this.config.chunkSize).length;
+            console.log(`📝 Split ${originalCount} oversized chunk(s) into ${splitCount + originalCount} sub-chunks in ${path.basename(filePath)}`);
         }
 
         if (validChunks.length === 0) {

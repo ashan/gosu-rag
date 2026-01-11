@@ -9,3 +9,4 @@ export {
     generateChunkId,
     generateContentHash,
 } from './types';
+export { splitOversizedChunk, splitOversizedChunks } from './chunkSplitter';
