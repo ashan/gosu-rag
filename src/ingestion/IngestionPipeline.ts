@@ -1,7 +1,7 @@
 import * as path from 'path';
 import Parser from 'tree-sitter';
 import { FileDiscovery, ParserFactory } from '../parsers';
-import { GosuChunker, GosuTemplateChunker, Chunk } from '../chunkers';
+import { GosuChunker, GosuTemplateChunker, Chunk, splitOversizedChunks } from '../chunkers';
 import { IEmbeddingProvider } from '../embeddings';
 import { IVectorStore } from '../vectorstore';
 import { HashTracker } from './HashTracker';
