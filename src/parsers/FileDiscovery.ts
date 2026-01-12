@@ -35,6 +35,8 @@ export class FileDiscovery {
 
     /**
      * Discover all files matching the given extensions recursively
+     * If rootPath is a file, return it directly (if it matches extensions)
+     * If rootPath is a directory, discover all matching files recursively
      */
     static async discoverFiles(options: FileDiscoveryOptions): Promise<string[]> {
         const {
@@ -44,6 +46,21 @@ export class FileDiscovery {
             maxDepth = -1,
         } = options;
 
+        // Check if rootPath is a file or directory
+        const stats = await fs.stat(rootPath);
+
+        if (stats.isFile()) {
+            // Single file - check if it matches extensions
+            const ext = path.extname(rootPath);
+            if (extensions.includes(ext)) {
+                return [path.resolve(rootPath)];
+            } else {
+                console.warn(`⚠️  File ${rootPath} does not match extensions: ${extensions.join(', ')}`);
+                return [];
+            }
+        }
+
+        // Directory - walk recursively
         const files: string[] = [];
         await this.walkDirectory(rootPath, rootPath, extensions, excludeDirs, maxDepth, 0, files);
         return files;

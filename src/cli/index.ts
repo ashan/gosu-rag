@@ -12,9 +12,13 @@ async function main() {
     if (!command) {
         console.error('Usage: npm run [ingest|query] [args]');
         console.error('\nCommands:');
-        console.error('  ingest [path]  - Ingest codebase from path (default: SOURCE_PATH from .env)');
+        console.error('  ingest [path]  - Ingest codebase from path (file or directory, default: SOURCE_PATH from .env)');
         console.error('  query <text>   - Query the knowledge base');
         console.error('  inspect        - Inspect ChromaDB collections');
+        console.error('\nExamples:');
+        console.error('  npm run ingest                    # Ingest from SOURCE_PATH');
+        console.error('  npm run ingest ./gsrc             # Ingest entire directory');
+        console.error('  npm run ingest ./gsrc/MyFile.gs   # Ingest single file');
         process.exit(1);
     }
 
