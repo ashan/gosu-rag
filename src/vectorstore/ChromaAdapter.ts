@@ -79,6 +79,7 @@ export class ChromaAdapter implements IVectorStore {
             if (filters.className) where.className = filters.className;
             if (filters.chunkType) where.chunkType = filters.chunkType;
             if (filters.language) where.language = filters.language;
+            if (filters.relativePath) where.relativePath = { "$contains": filters.relativePath };
         }
 
         const results = await this.collection.query({
