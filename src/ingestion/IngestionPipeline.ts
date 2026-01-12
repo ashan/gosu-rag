@@ -57,9 +57,26 @@ export class IngestionPipeline {
      */
     async ingest(sourcePath?: string): Promise<IngestionResult> {
         const startTime = Date.now();
-        const sourceRoot = sourcePath || this.config.sourcePath;
+        const providedPath = sourcePath || this.config.sourcePath;
 
-        console.log(`🚀 Starting ingestion from: ${sourceRoot}\n`);
+        // Determine the source root for relative path calculation
+        // If ingesting a single file, use config.sourcePath as root
+        // If ingesting a directory, use that directory as root
+        const fs = await import('fs/promises');
+        let sourceRoot = this.config.sourcePath;
+
+        try {
+            const stats = await fs.stat(providedPath);
+            if (stats.isDirectory()) {
+                sourceRoot = providedPath;
+            }
+            // If it's a file, keep sourceRoot as config.sourcePath
+        } catch {
+            // Path doesn't exist yet, use as-is
+            sourceRoot = providedPath;
+        }
+
+        console.log(`🚀 Starting ingestion from: ${providedPath}\n`);
 
         // Load hash cache
         await this.hashTracker.load();
@@ -67,7 +84,7 @@ export class IngestionPipeline {
         // Discover files
         console.log('📂 Discovering files...');
         const files = await FileDiscovery.discoverFiles({
-            rootPath: sourceRoot,
+            rootPath: providedPath,
             extensions: ['.gs', '.gsx', '.gst'],
         });
         console.log(`Found ${files.length} files\n`);

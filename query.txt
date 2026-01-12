@@ -1,0 +1,26 @@
+
+> gosu-chroma-rag@1.0.0 query
+> ts-node src/cli/index.ts query AccountEnhancement_ACC
+
+[dotenv@17.2.3] injecting env (15) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+🔍 Query: "AccountEnhancement_ACC"
+
+Connected to ChromaDB collection: guidewire-code
+
+📊 Found 2 results:
+
+
+1. Score: 18.8%
+   📁 
+   🏷️  Class: AccountEnhancement_ACC
+   📝 Type: class
+   📍 Lines: 19-216
+   💬 "enhancement AccountEnhancement_ACC : Account {    function validatePrimaryAddressState_ACC() {     var primaryAddress = this.AccountHolderContact.PrimaryAddress     var stateRequiredForAddress = Addre..."
+
+2. Score: 2.8%
+   📁 
+   🏷️  Class: AccountEnhancement_ACC
+   📝 Type: class
+   📍 Lines: 75-216
+   💬 "n_ACC != null) {       return "${this.StatusOfAccount_ACC.DisplayName} (${this.ActiveReason_ACC.DisplayName})"     } else {       return this.StatusOfAccount_ACC.DisplayName ?: ""     }   }    static ..."
+

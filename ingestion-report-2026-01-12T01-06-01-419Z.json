@@ -1,0 +1,27 @@
+{
+  "sessionId": "2026-01-12T01-06-01-419Z",
+  "timestamp": "2026-01-12T01:06:02.590Z",
+  "summary": [
+    {
+      "status": "success",
+      "count": 1,
+      "total_chunks": 33
+    }
+  ],
+  "logs": [
+    {
+      "id": 1,
+      "timestamp": "2026-01-12T01:06:02.589Z",
+      "session_id": "2026-01-12T01-06-01-419Z",
+      "file_path": "/Users/dev/typescript/gosu-chroma-rag/gsrc/nz/co/acc/account/AccountEnhancement_ACC.gsx",
+      "relative_path": "",
+      "status": "success",
+      "chunk_count": 33,
+      "error_message": null,
+      "error_details": null,
+      "line_number": null,
+      "column_number": null,
+      "duration": 1153
+    }
+  ]
+}
