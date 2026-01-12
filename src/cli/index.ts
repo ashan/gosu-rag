@@ -37,7 +37,15 @@ async function main() {
                 await runIngest(args[1]);
                 break;
             case 'query':
-                await runQuery(args.slice(1).join(' '));
+                // Extract query text (everything between 'query' and first flag)
+                let queryText = '';
+                for (let i = 1; i < args.length; i++) {
+                    if (args[i].startsWith('--')) {
+                        break; // Stop at first flag
+                    }
+                    queryText += (queryText ? ' ' : '') + args[i];
+                }
+                await runQuery(queryText);
                 break;
             case 'inspect':
                 console.log('Use: npm run inspect-chroma');
