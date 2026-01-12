@@ -171,6 +171,30 @@ graph LR
 - Node.js 18+ and npm
 - Docker and Docker Compose
 - OpenAI API key
+- **Build tools** (required for native dependencies)
+
+### Build Requirements
+
+This project uses native Node.js modules (`better-sqlite3`, `tree-sitter`) that require compilation during installation.
+
+**macOS:**
+```bash
+xcode-select --install
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get install -y build-essential python3
+```
+
+**Linux (Fedora/CentOS):**
+```bash
+sudo yum install gcc-c++ make python3
+```
+
+**Windows:**
+- Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+- Or install via chocolatey: `choco install visualstudio2022buildtools`
 
 ### Installation
 
