@@ -574,7 +574,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/gosu-chroma-rag/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/gosu-chroma-rag/discussions)
-- **Email**: your.email@example.com
+- **Email**: k.a.a.dilantha@gmail.com
 
 ---
 
