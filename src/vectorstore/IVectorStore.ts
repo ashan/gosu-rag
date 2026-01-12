@@ -5,6 +5,7 @@ export interface QueryFilter {
     className?: string;
     chunkType?: string;
     language?: string;
+    relativePath?: string;
 }
 
 export interface QueryResult {
