@@ -115,11 +115,17 @@ export class ChromaAdapter implements IVectorStore {
                         },
                     };
 
+                    // ChromaDB returns squared Euclidean distance
+                    // Convert to similarity score: smaller distance = higher similarity
+                    // Use 1 / (1 + distance) to normalize to [0, 1] range
+                    const similarityScore = 1 / (1 + distance);
+
                     queryResults.push({
                         chunk,
-                        score: 1 - distance, // Convert distance to similarity score
+                        score: similarityScore,
                         distance,
                     });
+
                 }
             }
         }
