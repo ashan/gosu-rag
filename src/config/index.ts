@@ -20,11 +20,12 @@ const configSchema = z.object({
         .transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
 
     // Embeddings Configuration
-    embeddingProvider: z.enum(['openai', 'ollama']).default('openai'),
+    embeddingProvider: z.enum(['openai', 'google', 'ollama']).default('openai'),
     embeddingModel: z.string().default('text-embedding-3-small'),
     embeddingBatchSize: z.coerce.number().positive().default(100),
     embeddingConcurrency: z.coerce.number().positive().default(5),
     openaiApiKey: z.string().optional(),
+    googleApiKey: z.string().optional(),
 
     // Vector Store Configuration
     vectorStore: z.enum(['chroma']).default('chroma'),
@@ -50,6 +51,7 @@ export function loadConfig(): Config {
         embeddingBatchSize: process.env.EMBEDDING_BATCH_SIZE,
         embeddingConcurrency: process.env.EMBEDDING_CONCURRENCY,
         openaiApiKey: process.env.OPENAI_API_KEY,
+        googleApiKey: process.env.GOOGLE_API_KEY,
         vectorStore: process.env.VECTOR_STORE,
         chromaHost: process.env.CHROMA_HOST,
         chromaPort: process.env.CHROMA_PORT,

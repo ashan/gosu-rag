@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { ChromaAdapter } from '../vectorstore';
-import { OpenAIEmbeddingProvider } from '../embeddings';
+import { createEmbeddingProvider } from '../embeddings';
 import { IngestionPipeline } from '../ingestion';
 import { QueryService } from '../query';
 
@@ -64,7 +64,7 @@ async function runIngest(sourcePath?: string) {
     console.log('🚀 RAG Ingestion Pipeline\n');
 
     // Initialize components
-    const embeddingProvider = new OpenAIEmbeddingProvider();
+    const embeddingProvider = createEmbeddingProvider();
     const vectorStore = new ChromaAdapter();
 
     await vectorStore.connect();
@@ -133,7 +133,7 @@ async function runQuery(queryText: string) {
     console.log();
 
     // Initialize components
-    const embeddingProvider = new OpenAIEmbeddingProvider();
+    const embeddingProvider = createEmbeddingProvider();
     const vectorStore = new ChromaAdapter();
 
     await vectorStore.connect();
