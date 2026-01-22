@@ -309,6 +309,25 @@ npx ts-node src/cli/index.ts query "gw" --chunk-type file --file AccountEnhancem
 
 ---
 
+## 🏷️ Metadata Reference
+
+Each ingested source code chunk includes schema-rich metadata for precise filtering:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `absolutePath` | string | Full absolute path to the source file |
+| `relativePath` | string | Path relative to the source root (e.g., `nz/co/acc/Claim.gs`) |
+| `package` | string | Gosu package name (e.g., `nz.co.acc`) |
+| `className` | string | Name of the class or enhancement |
+| `methodName` | string | Name of the function or method (for function/method chunks) |
+| `chunkType` | string | AST node type: `class`, `function`, `property`, `uses`, `template_block`, etc. |
+| `language` | string | `gosu` or `gosu_template` |
+| `lineStart` | number | Starting line number in the source file |
+| `lineEnd` | number | Ending line number in the source file |
+| `contentHash` | string | SHA-256 hash of the content for change detection |
+
+---
+
 ## 📁 Project Structure
 
 ```
