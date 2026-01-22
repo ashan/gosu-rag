@@ -4,7 +4,23 @@
   "description": "Production-grade RAG ingestion platform for Guidewire Gosu codebase",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli/index.js",
+      "require": "./dist/cli/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
+    "install": "prebuild-install || echo 'Prebuild not available, will use source'",
     "prepare": "npm run build",
     "build": "tsc",
     "dev": "ts-node src/cli/index.ts",
@@ -29,20 +45,24 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@types/node": "^25.0.3",
+    "@types/node": "^20.11.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.5.0",
-    "chromadb": "^3.2.0",
-    "dotenv": "^17.2.3",
-    "openai": "^6.16.0",
-    "tree-sitter": "^0.25.0",
+    "better-sqlite3": "^11.5.0",
+    "chromadb": "^1.8.1",
+    "dotenv": "^16.4.5",
+    "openai": "^4.71.0",
+    "prebuild-install": "^7.1.2",
+    "tree-sitter": "^0.22.0",
     "tree-sitter-gosu": "github:ashan/tree-sitter-gosu",
     "tree-sitter-gosu-template": "github:ashan/tree-sitter-gosu-template",
-    "zod": "^4.3.5"
+    "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
