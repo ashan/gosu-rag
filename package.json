@@ -23,12 +23,12 @@
     "install": "prebuild-install || echo 'Prebuild not available, will use source'",
     "prepare": "npm run build",
     "build": "tsc",
-    "dev": "ts-node src/cli/index.ts",
-    "ingest": "ts-node src/cli/index.ts ingest",
-    "query": "ts-node src/cli/index.ts query",
-    "inspect-chroma": "ts-node scripts/inspect-chroma.ts",
-    "view-logs": "ts-node scripts/view-logs.ts",
-    "extract-parse-errors": "ts-node scripts/extract-parse-errors.ts",
+    "dev": "tsx src/cli/index.ts",
+    "ingest": "tsx src/cli/index.ts ingest",
+    "query": "tsx src/cli/index.ts query",
+    "inspect-chroma": "tsx scripts/inspect-chroma.ts",
+    "view-logs": "tsx scripts/view-logs.ts",
+    "extract-parse-errors": "tsx scripts/extract-parse-errors.ts",
     "clean-cache": "rm -f .rag-cache.json ingestion.db ingestion-report-*.json && echo '✅ Cleaned: hash cache and logs (ChromaDB data preserved)'",
     "clean-all": "rm -f .rag-cache.json ingestion.db ingestion-report-*.json && rm -rf chroma_data/ && echo '✅ Cleaned: everything (run docker compose up -d before ingesting)'",
     "clean-ingest": "npm run clean-cache && npm run ingest",
@@ -47,6 +47,7 @@
   "devDependencies": {
     "@types/node": "^20.11.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
@@ -57,7 +58,7 @@
     "dotenv": "^16.4.5",
     "openai": "^4.71.0",
     "prebuild-install": "^7.1.2",
-    "tree-sitter": "^0.22.0",
+    "tree-sitter": "^0.25.0",
     "tree-sitter-gosu": "github:ashan/tree-sitter-gosu",
     "tree-sitter-gosu-template": "github:ashan/tree-sitter-gosu-template",
     "zod": "^3.23.8"
