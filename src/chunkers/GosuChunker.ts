@@ -7,9 +7,12 @@ import { loadConfig } from '../config';
 export class GosuChunker implements IChunker {
     private config = loadConfig();
     private sourceRoot: string;
+    private module?: string;
 
-    constructor(sourceRoot: string) {
+    constructor(sourceRoot: string, module?: string) {
         this.sourceRoot = sourceRoot;
+        // Derive module from source root folder name if not provided
+        this.module = module || path.basename(sourceRoot).toLowerCase();
     }
 
     async extractChunks(
@@ -121,6 +124,7 @@ export class GosuChunker implements IChunker {
         return createChunk(content, {
             absolutePath,
             relativePath,
+            module: this.module,
             package: packageName,
             className: this.isClassLevel(node.type) ? name : undefined,
             methodName: this.isMethodLevel(node.type) ? name : undefined,

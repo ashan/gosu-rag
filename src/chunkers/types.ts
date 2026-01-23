@@ -19,6 +19,9 @@ export interface ChunkMetadata {
     /** Relative file path from source root */
     relativePath: string;
 
+    /** Guidewire module (policycenter, billingcenter, etc.) */
+    module?: string;
+
     /** Package or namespace */
     package?: string;
 
@@ -59,6 +62,7 @@ export interface Chunk {
  */
 export function generateChunkId(metadata: ChunkMetadata, chunkIndex?: number): string {
     const parts = [
+        metadata.module,
         metadata.relativePath,
         metadata.package,
         metadata.className,

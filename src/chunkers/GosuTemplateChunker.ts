@@ -7,9 +7,12 @@ import { loadConfig } from '../config';
 export class GosuTemplateChunker implements IChunker {
     private config = loadConfig();
     private sourceRoot: string;
+    private module?: string;
 
-    constructor(sourceRoot: string) {
+    constructor(sourceRoot: string, module?: string) {
         this.sourceRoot = sourceRoot;
+        // Derive module from source root folder name if not provided
+        this.module = module || path.basename(sourceRoot).toLowerCase();
     }
 
     async extractChunks(
@@ -98,6 +101,7 @@ export class GosuTemplateChunker implements IChunker {
         return createChunk(content, {
             absolutePath,
             relativePath,
+            module: this.module,
             chunkType,
             language: 'gosu_template',
             lineStart: startLine + 1,
