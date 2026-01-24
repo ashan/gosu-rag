@@ -20,10 +20,10 @@ const configSchema = z.object({
         .transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
 
     // Embeddings Configuration
-    embeddingProvider: z.enum(['openai', 'google', 'ollama']).default('openai'),
-    embeddingModel: z.string().default('text-embedding-3-small'),
-    embeddingBatchSize: z.coerce.number().positive().default(100),
-    embeddingConcurrency: z.coerce.number().positive().default(5),
+    embeddingProvider: z.enum(['openai', 'google', 'ollama']).default('ollama'),
+    embeddingModel: z.string().default('mxbai-embed-large'),
+    embeddingBatchSize: z.coerce.number().positive().default(500),
+    embeddingConcurrency: z.coerce.number().positive().default(10),
     openaiApiKey: z.string().optional(),
     googleApiKey: z.string().optional(),
 

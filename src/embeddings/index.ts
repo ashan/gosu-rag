@@ -1,10 +1,12 @@
 export { IEmbeddingProvider } from './IEmbeddingProvider';
 export { OpenAIEmbeddingProvider } from './OpenAIEmbeddingProvider';
 export { GoogleEmbeddingProvider } from './GoogleEmbeddingProvider';
+export { OllamaEmbeddingProvider } from './OllamaEmbeddingProvider';
 
 import { IEmbeddingProvider } from './IEmbeddingProvider';
 import { OpenAIEmbeddingProvider } from './OpenAIEmbeddingProvider';
 import { GoogleEmbeddingProvider } from './GoogleEmbeddingProvider';
+import { OllamaEmbeddingProvider } from './OllamaEmbeddingProvider';
 import { loadConfig, type Config } from '../config';
 
 /**
@@ -19,8 +21,9 @@ export function createEmbeddingProvider(config?: Config): IEmbeddingProvider {
         case 'google':
             return new GoogleEmbeddingProvider();
         case 'ollama':
-            throw new Error('Ollama embedding provider not yet implemented');
+            return new OllamaEmbeddingProvider();
         default:
             throw new Error(`Unsupported embedding provider: ${cfg.embeddingProvider}`);
     }
 }
+
